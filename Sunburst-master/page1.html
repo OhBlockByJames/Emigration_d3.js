@@ -287,7 +287,15 @@ function show_top5(num1,num2){
 			.data(data)
 			.enter()
 			.append("path")
-			.attr("marker-end", "url(#my-arrow)")
+			//.attr("marker-end", "url(#my-arrow)")
+			.attr("marker-end", function(d) { 
+				if (d.rank!=0){
+					return "url(#my-arrow)";
+				}
+				else{
+					return null;
+				}
+				})
 			.attr("class","china_route")
 			.attr('d', function(d) {
 				var long = parseFloat(d.long);
