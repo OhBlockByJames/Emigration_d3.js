@@ -277,6 +277,120 @@ function clean(country){
 
 }
 
+function show_top5(num1,num2){
+	d3.csv("https://raw.githubusercontent.com/OhBlockByJames/Emigration_d3.js/main/top5.csv", function (error, routes) {
+		clean();
+		var data = routes.slice(num1,num2);
+		var maxVolume = d3.max(routes, function(d) { return d.vol; });
+		//append china path
+		routePath = g2.selectAll(".china_route")
+			.data(data)
+			.enter()
+			.append("path")
+			.attr("marker-end", "url(#my-arrow)")
+			.attr("class","china_route")
+			.attr('d', function(d) {
+				var long = parseFloat(d.long);
+				var lat = parseFloat(d.lat);
+				var destlong = parseFloat(d.longdest);
+				var destlat = parseFloat(d.latdest);
+				var location=[long,lat];
+				var dest=[destlong,destlat];
+				return path ({ 
+				type:"LineString",
+				coordinates: [ location,dest ],
+				});
+			})
+			.style("stroke-width", function(d) { 
+				return (d.people/400000);
+			})
+			.style("stroke",function(d) { 
+				if (d.people>8000000){
+					return "#FF0000" ;
+				}
+				else if (d.people>4000000&&d.people<8000000){
+					return "#FF0000";
+				}
+				else if (d.people>2000000&&d.people<4000000){
+					return "#FF0000";
+				}
+				else if (d.people>1000000&&d.people<2000000){
+					return "#FF0000";
+				}
+				else if (d.people>500000&&d.people<1000000){
+					return "#600000";
+				}
+				else if (d.people>250000&&d.people<500000){
+					return "#600000";
+				}
+				else {
+					return "#600000";
+				}
+			 })
+
+			.transition().duration(500)
+			.style("opacity",0.6);
+
+		//append china text
+		portLabels = g2.selectAll(".label_china")
+			.data(data)
+			.enter()
+			.append("text")
+			.attr("x", function(d) { 
+				var long = parseFloat(d.long);
+				var lat = parseFloat(d.lat);
+				var destlong = parseFloat(d.longdest);
+				var destlat = parseFloat(d.latdest);
+				var longoff=parseFloat(d.longoff);
+				var location=[long,lat];
+				var dest=[destlong,destlat];
+				return projection(dest)[0] 
+			})
+			.attr("y", function(d) { 
+				var destlong = parseFloat(d.longdest);
+				var destlat = parseFloat(d.latdest);
+				var latoff=parseFloat(d.latoff);
+				var dest=[destlong,destlat];
+				return projection(dest)[1]
+			} )
+			.text(function(d) { 
+				if (d.rank==0){
+					return "Emigrations: "+d.people;
+				}
+				else{
+					return d.destination+" rank:"+ d.rank;
+				}
+				
+			})
+			.attr("class","label_china")
+			.style("font-size", "1px")
+			.style("opacity",0);
+		//append china circles
+		portMarkers = g1.selectAll(".ports_china")
+			.data(data)
+			.enter()
+			.append("circle")
+			.attr("class","ports_china")
+			.attr("cx", function(d) { 
+				var destlong = parseFloat(d.longdest);
+				var destlat = parseFloat(d.latdest);
+				var dest=[destlong,destlat];
+				return projection(dest)[0]
+			} )
+			.attr("cy", function(d) { 
+				var destlong = parseFloat(d.longdest);
+				var destlat = parseFloat(d.latdest);
+				var dest=[destlong,destlat];
+				return projection(dest)[1]
+			 } )
+			.attr("r", 1)
+			.style("fill","black")
+			.style("stroke-width",1)
+			.style("stroke","#000000")
+			.style("opacity",1);
+			})
+		}
+
 function show_2020(num1,num2){
 	d3.csv("https://raw.githubusercontent.com/OhBlockByJames/D3.js_Project/main/2020.csv", function (error, routes) {
 		$('.year-label').text(2020);
@@ -1741,7 +1855,7 @@ g1.append("g")
 
 
 let Click = function(d) {
-	console.log(d.properties.name);
+
 	d3.select(this)
 		.style("opacity", 0.7)
 		// .style("stroke", "blue")
@@ -1751,6 +1865,118 @@ let Click = function(d) {
 		.style("top", (d3.mouse(this)[1]) + "px")
 		.html("Country Name: "+d.properties.name)
 		.style("opacity", 1)
+	//on click map
+	if(d.properties.name=="India"&& $('.year-label').text()==2020){
+		show_top5(0,18);
+	}
+	else if (d.properties.name=="Mexico"&& $('.year-label').text()==2020){
+		show_top5(18,20);
+	}
+	else if (d.properties.name=="Russia"&& $('.year-label').text()==2020){
+		show_top5(20,32);
+	}
+	else if (d.properties.name=="China"&& $('.year-label').text()==2020){
+		show_top5(32,47);
+	}
+	else if (d.properties.name=="Syria"&& $('.year-label').text()==2020){
+		show_top5(47,56);
+	}
+	//2015
+	else if (d.properties.name=="India"&& $('.year-label').text()==2015){
+		show_top5(56,72);
+	}
+	else if (d.properties.name=="Mexico"&& $('.year-label').text()==2015){
+		show_top5(72,74);
+	}
+	else if (d.properties.name=="China"&& $('.year-label').text()==2015){
+		show_top5(74,87);
+	}
+	else if (d.properties.name=="Russia"&& $('.year-label').text()==2015){
+		show_top5(87,99);
+	}
+	else if (d.properties.name=="Bangladesh"&& $('.year-label').text()==2015){
+		show_top5(99,110);
+	}
+	//2010
+	else if (d.properties.name=="India"&& $('.year-label').text()==2010){
+		show_top5(110,126);
+	}
+	else if (d.properties.name=="Mexico"&& $('.year-label').text()==2010){
+		show_top5(126,128);
+	}
+	else if (d.properties.name=="Russia"&& $('.year-label').text()==2010){
+		show_top5(128,140);
+	}
+	else if (d.properties.name=="China"&& $('.year-label').text()==2010){
+		show_top5(140,152);
+	}
+	else if (d.properties.name=="Bangladesh"&& $('.year-label').text()==2010){
+		show_top5(152,162);
+	}
+	//2005
+	else if (d.properties.name=="Mexico"&& $('.year-label').text()==2005){
+		show_top5(162,164);
+	}
+	else if (d.properties.name=="Russia"&& $('.year-label').text()==2005){
+		show_top5(164,176);
+	}
+	else if (d.properties.name=="India"&& $('.year-label').text()==2005){
+		show_top5(176,190);
+	}
+	else if (d.properties.name=="China"&& $('.year-label').text()==2005){
+		show_top5(190,200);
+	}
+	else if (d.properties.name=="Ukraine"&& $('.year-label').text()==2005){
+		show_top5(200,210);
+	}
+	//2000
+	else if (d.properties.name=="Russia"&& $('.year-label').text()==2000){
+		show_top5(210,222);
+	}
+	else if (d.properties.name=="Mexico"&& $('.year-label').text()==2000){
+		show_top5(222,224);
+	}
+	else if (d.properties.name=="India"&& $('.year-label').text()==2000){
+		show_top5(224,234);
+	}
+	else if (d.properties.name=="China"&& $('.year-label').text()==2000){
+		show_top5(234,242);
+	}
+	else if (d.properties.name=="Ukraine"&& $('.year-label').text()==2000){
+		show_top5(242,252);
+	}
+	//1995
+	else if (d.properties.name=="Russia"&& $('.year-label').text()==1995){
+		show_top5(252,266);
+	}
+	else if (d.properties.name=="India"&& $('.year-label').text()==1995){
+		show_top5(266,276);
+	}
+	else if (d.properties.name=="Mexico"&& $('.year-label').text()==1995){
+		show_top5(276,278);
+	}
+	else if (d.properties.name=="Ukraine"&& $('.year-label').text()==1995){
+		show_top5(278,287);
+	}
+	else if (d.properties.name=="Bangladesh"&& $('.year-label').text()==1995){
+		show_top5(287,293);
+	}
+	//1990
+	else if (d.properties.name=="Russia"&& $('.year-label').text()==1990){
+		show_top5(293,308);
+	}
+	else if (d.properties.name=="Afghanistan"&& $('.year-label').text()==1990){
+		show_top5(308,312);
+	}
+	else if (d.properties.name=="India"&& $('.year-label').text()==1990){
+		show_top5(312,322);
+	}
+	else if (d.properties.name=="Ukraine"&& $('.year-label').text()==1990){
+		show_top5(322,331);
+	}
+	else if (d.properties.name=="Bangladesh"&& $('.year-label').text()==1990){
+		show_top5(331,337);
+	}
 }
 //mouse on map
 let mouseOver = function(d) {
