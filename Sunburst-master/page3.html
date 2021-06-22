@@ -1,35 +1,39 @@
 <!DOCTYPE html>
 <html>
-
-<head>
-  <title>World Immigrants</title>
-  <link href="styles.css" rel="stylesheet" />
-  <script src="https://unpkg.com/react@16.9.0/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@16.9.0/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/d3@5.11.0/dist/d3.min.js"></script>
-  <script src="https://unpkg.com/topojson@3.0.2/dist/topojson.min.js"></script>
-  <script type="text/javascript"
-    src="https://gitcdn.link/repo/upphiminn/d3.ForceBundle/master/d3-ForceEdgeBundling.js"></script>
+  <head>
+    <title>World Immigrants</title>
+    <link href="styles.css" rel="stylesheet" />
+    <script src="https://unpkg.com/react@16.9.0/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@16.9.0/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/d3@5.11.0/dist/d3.min.js"></script>
+    <script src="https://unpkg.com/topojson@3.0.2/dist/topojson.min.js"></script>
+      <script
+  src="https://code.jquery.com/jquery-3.6.0.js"
+  integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+  crossorigin="anonymous"></script>
+	<script type="text/javascript" src="https://gitcdn.link/repo/upphiminn/d3.ForceBundle/master/d3-ForceEdgeBundling.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
-    crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+      <script
+  src="https://code.jquery.com/jquery-3.6.0.js"
+  integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+  crossorigin="anonymous"></script>
 
-</head>
-
-<body>
-  <nav class="navbar navbar-default">
+  </head>
+  <body>
+      <nav class="navbar navbar-default">
     <div class="container-fluid">
       <ul class="nav navbar-nav">
         <li><a href="page1.html"><span class="glyphicon glyphicon-object-align-bottom"></span> Flow Map </a></li>
         <li><a href="page2.html"><span class="glyphicon glyphicon-object-align-bottom"></span> Sunburst </a></li>
-        <li><a href="page3.html"><span class="glyphicon glyphicon-object-align-bottom"></span> Edge bundling Flow
-            Map</a></li>
       </ul>
     </div>
   </nav>
-  <div id="root"></div>
-  <script src="bundle.js"></script>
-</body>
+     <div height="20%" style="font-size:0.5px" padding="0px" >
+      圖名:World Immigrants flow map <br>圖例說明:透過點擊世界地圖上的國家區域，來觀看從此國家流出到其他國家的流向，底下是10個流出數量最多國家的Bar chart 簡要說明:移民圖表最好還是能夠繪製在世界地圖上面，但就會面臨資料量重疊的問題，原本打算實作OD data smoothing algorithm 但時間上有點困難，最後選擇改用 edge bundling在解決問題。至於實際資料的顯示可以透過Tooltip來表示，但太過繁瑣且依賴互動，所以改用multiview ，在底下加上數字最高10個國家bar chart.
+    </div>
+    <div id="root"></div>
+    <script src="bundle.js"></script>
 
+  </body>
 </html>
