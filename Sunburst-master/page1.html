@@ -26,9 +26,10 @@
    }
 .container{
    display:flex; 
-   padding-right: 0px;
+    padding-right: 0px;
     padding-left: 0px;
-
+	margin-left: 0px;
+	margin-right: 0px;
 	}
 
 	.item-right{
@@ -97,7 +98,7 @@
 				float:left;
 			}
 			.my_dataviz{
-				float:left;			
+				float:left;
 			}
 		.card-text{
 		font-size: 18px;
@@ -160,7 +161,7 @@
     <div class="col-3">
         <button class="btn btn-success" id="year-play-btn">Play <i class="fas fa-play"></i></button>
         <button class="btn btn-danger" id="clean">Clean</button>
-        <button class="btn btn-warning" id="refresh" onClick="window.location.reload();">Refresh</button>
+        <button class="btn btn-warning" id="zoom" onClick="window.location.reload();">Zoom out</button>
 			<tr>
 				<td><button id="button_1990" class="btn1990">1990</button></td>
 				<td><button id="button_1995"class="btn1990">1995</button></td>
@@ -186,13 +187,13 @@
             <p class="card-text">
                 <b>● 操作說明 ●</b><br>
                 下方的時間軸可以使用滑鼠拖拉，在1990至2020年間的資料切換。Play鈕可以用動畫的方式顯示1990至2020年的變化。
-                <br>Clean按鈕可以清空地圖。按鈕則可以自行選取不同年代做疊圖比較。
+                <br>Clean按鈕可以清空地圖。按鈕則可以自行選取不同年代做疊圖比較。長條圖會依照使用者顯示不同資料。點擊橘點可以顯示該國的移民輸出國。
                 <br><br>
                 <b>● 圖片說明 ●</b><br>
                 呈現各國之間的移民路徑，線條粗細代表移民人數多寡。若線條為紅色，代表該移民路徑女性多於男性；藍色則代表該移民路徑男性多於女性。<br>黃點代表移民輸出國，橘點代表該年前五名移民輸出國，箭頭為移民方向，黑點代表輸入國。國家顏色深淺代表該國GDP高低。
                 <br><br>
                 <b>● 圖片分析 ●</b><br>
-                可以由歷年移民觀察出趨勢，90年代蘇聯瓦解、中東局部戰爭造就移民潮。2000年後，中國、印度崛起造就大量移民潮。<br>中國的移民主要趨勢為歐美，而印度和孟加拉則移民至西亞。加勒比海地區開始出現大量移民前往美國。2015後，敘利亞內戰造成難民移民至鄰近各國，成為新的移民潮。
+                可以由歷年移民觀察出趨勢，90年代蘇聯瓦解、中東局部戰爭造就移民潮，可以從地圖上看出俄羅斯、烏克蘭和阿富汗都有移民湧現。2000年後，中國、印度崛起造就另一個移民潮，這個移民潮在往後幾年皆可看到。<br>中國的移民主要趨勢為歐美，而印度和孟加拉則移民至西亞和南亞。墨西哥和加勒比海地區開始出現大量移民前往美國。2015後，敘利亞內戰造成難民移民至鄰近各國和歐洲，成為新的移民潮。
             </p>
         </div>
     </div>
@@ -266,38 +267,45 @@
 		}
 	});
 			$('#button_2020').on('click',function(){
+				clean();
 				show_2020(0,107);
 				update(Top2020);
 			});
 
-			//small rectangle listener
+			
 			$('#button_2015').click(function(){
+				clean();
 				show_2015(0,91);
 				update(Top2015);
 			});
 
-			//fill small rectangle listener
+			
 			$('#button_2010').click(function(){
+				clean();
 				show_2010(0,79);
 				update(Top2010);
 			});
 
 			$('#button_2005').click(function(){
+				clean();
 				show_2005(0,63);
 				update(Top2005);
 			});
 
 			$('#button_2000').click(function(){
+				clean();
 				show_2000(0,56);
 				update(Top2000);
 			});
 
 			$('#button_1995').click(function(){
+				clean();
 				show_1995(0,52);
 				update(Top1995);
 			});
 
 			$('#button_1990').click(function(){
+				clean();
 				show_1990(0,45);
 				update(Top1990);
 			});
@@ -379,25 +387,25 @@ function show_top5(num1,num2){
 			})
 			.style("stroke",function(d) { 
 				if (d.people>8000000){
-					return "#FF0000" ;
+					return "#CE0000" ;
 				}
 				else if (d.people>4000000&&d.people<8000000){
-					return "#FF0000";
+					return "#CE0000";
 				}
 				else if (d.people>2000000&&d.people<4000000){
-					return "#FF0000";
+					return "#CE0000";
 				}
 				else if (d.people>1000000&&d.people<2000000){
-					return "#FF0000";
+					return "#CE0000";
 				}
 				else if (d.people>500000&&d.people<1000000){
-					return "#600000";
+					return "#FF5151";
 				}
 				else if (d.people>250000&&d.people<500000){
-					return "#600000";
+					return "#FF7575";
 				}
 				else {
-					return "#600000";
+					return "#FF7575";
 				}
 			 })
 
@@ -2389,10 +2397,10 @@ var Top2020 = [
 ];
 
 var Top2015 = [
-   {group: "India", value: 17869492},
-   {group: "Mexico", value: 11185737},
-   {group: "China", value: 10756697},
-   {group: "Russia", value: 10461170},
+   {group: "India", value: 15885657},
+   {group: "Mexico", value: 11923234},
+   {group: "China", value: 10240817},
+   {group: "Russia", value: 10179999},
    {group: "Bangladesh", value: 6831282},
 ];
 
@@ -2440,7 +2448,7 @@ var Top1990 = [
 
 // set the dimensions and margins of the graph
 var margin = {top: 30, right: 30, bottom: 70, left: 60},
-    width = 300 - margin.left - margin.right,//460
+    width = 280 - margin.left - margin.right,//460
     height = 530 - margin.top - margin.bottom;//400
 
 // append the svg object to the body of the page
@@ -2493,7 +2501,7 @@ function update(data) {
       .attr("height", function(d) { return height - y(d.value); })
       .attr("fill", function(d) { 
       if (d.value>5000000){
-      	return "#FF0000";
+      	return "#CE0000";
       }
       else if (d.value<5000000&&d.value>1000000){
       	return "#FF5151";
