@@ -16,7 +16,6 @@
   <script src="https://rawgithub.com/markmarkoh/datamaps/master/dist/datamaps.none.min.js"></script>
   <script src="https://datamaps.github.io/scripts/0.4.0/datamaps.world.min.js?v=1"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <!-- <link rel="stylesheet" type="text/css" href="../CSS/barchart.css"> -->
   <link rel="stylesheet" type="text/css" href="sunburst.css">
 </head>
 
@@ -32,110 +31,76 @@
     </div>
   </nav>
   <div class="container">
-    <!-- 用來選擇區域/國家-->
-    <h1>Visualizations</h1>
-    <div class="container">
+    <div class="graph">
+      <h2>The distribution of immigrants <br> per country in
+        2021</h2>
       <div class="row">
-        <div class="col-lg-12">
-          <select id="dropdown-countries" name="dropdown-countries" style="height:25px; width: 190px;"
-            onchange="Class(this.id)">
-            <option id="WORLD">WORLD</option>
+        <select id="dropdown-countries" name="dropdown-countries" onchange="Class(this.id)">
+          <option id="WORLD">WORLD</option>
 
-            <option id="AFRICA">AFRICA</option>
-            <option id="Eastern Africa">Eastern Africa</option>
-            <option id="Northern Afirca">Northern Afirca</option>
-            <option id="Southern Africa">Southern Africa</option>
-            <option id="Western Africa">Western Africa</option>
-            <option id="Middle Africa">Middle Africa</option>
+          <option id="AFRICA">AFRICA</option>
+          <option id="Eastern Africa">Eastern Africa</option>
+          <option id="Northern Afirca">Northern Afirca</option>
+          <option id="Southern Africa">Southern Africa</option>
+          <option id="Western Africa">Western Africa</option>
+          <option id="Middle Africa">Middle Africa</option>
 
-            <option id="ASIA">ASIA</option>
-            <option id="Central Asia">Central Asia</option>
-            <option id="Eastern Asia">Eastern Asia</option>
-            <option id="South-Eastern Asia">South-Eastern Asia</option>
-            <option id="Southern Asia">Southern Asia</option>
-            <option id="Western Asia">Western Asia</option>
+          <option id="ASIA">ASIA</option>
+          <option id="Central Asia">Central Asia</option>
+          <option id="Eastern Asia">Eastern Asia</option>
+          <option id="South-Eastern Asia">South-Eastern Asia</option>
+          <option id="Southern Asia">Southern Asia</option>
+          <option id="Western Asia">Western Asia</option>
 
-            <option id="EUROPE">EUROPE</option>
-            <option id="Eastern Europe">Eastern Europe</option>
-            <option id="Northern Europe">Northern Europe</option>
-            <option id="Southern Europe">Southern Europe</option>
-            <option id="Western Europe">Western Europe</option>
+          <option id="EUROPE">EUROPE</option>
+          <option id="Eastern Europe">Eastern Europe</option>
+          <option id="Northern Europe">Northern Europe</option>
+          <option id="Southern Europe">Southern Europe</option>
+          <option id="Western Europe">Western Europe</option>
 
-            <option id="AMERICA AND THE CARIBBEAN">AMERICA AND THE CARIBBEAN</option>
-            <option id="Caribbean">Caribbean</option>
-            <option id="Central America">Central America</option>
-            <option id="South America">South America</option>
-            <option id="Northern America">Northern America</option>
+          <option id="AMERICA AND THE CARIBBEAN">AMERICA AND THE CARIBBEAN</option>
+          <option id="Caribbean">Caribbean</option>
+          <option id="Central America">Central America</option>
+          <option id="South America">South America</option>
+          <option id="Northern America">Northern America</option>
 
-            <option id="OCEANIA">OCEANIA</option>
-            <option id="Australia and New Zealand">Australia and New Zealand</option>
-            <option id="Melanesia">Melanesia</option>
-            <option id="Micronesia">Micronesia</option>
-            <option id="Polynesia">Polynesia</option>
+          <option id="OCEANIA">OCEANIA</option>
+          <option id="Australia and New Zealand">Australia and New Zealand</option>
+          <option id="Melanesia">Melanesia</option>
+          <option id="Micronesia">Micronesia</option>
+          <option id="Polynesia">Polynesia</option>
 
-          </select>
-        </div>
+        </select>
+      </div>
+      <div id="sunburst-column">
+      </div>
+    </div>
+
+    <div class="intro">
+      <div class="intro1">
+        <h2>圖表說明</h2>
+        <p>此圖表為表示2021年世界總遷移人口佔比的旭日圖。</p>
+        <p>之所以選用旭日圖，是因為其由多個同心圓環組成，每個圓環層代表不同層級的數據，能清晰地表示多層級的歸屬關係。</p>
+        <p>在此圖表，初始圓心代表世界遷移總人口，外環的三層，對應我們將資料分為三層：</p>
+        <p>1. 第一層將世界劃分為五大洲（亞、歐、美、非、大洋）。</p>
+        <p>2. 第二層將每個洲又再進行劃分，例如亞洲劃分為中、東、東南、西、南亞。</p>
+        <p>3. 第三層為國家層級。</p>
+        <p>使用顏色的深淺代表子層占母層的比例多寡。</p>
+        <p>註：國家層級之國家以遷移人口數大於20萬為篩選條件，小於20萬之國家則統一集合成「Others」計算。</p>
+      </div>
+      <div class="intro2">
+        <h2>操作說明</h2>
+        <p>
+          當點擊旭日圖某區塊時，旭日圖會呈現以該區塊為母層的相對應內容，中間的圓心表示該曲塊的母層。</p>
+        <p>
+          舉例：於初始旭日圖點擊「亞洲」，旭日圖改為呈現以「亞洲」為母層的資料，故此時圓心為世界（該區塊的母層），第一層為亞洲，第二層為「中、東、東南、西、南亞洲」，第三層則為移民至中、東、東南、西、南亞洲的「國家」。各層區塊的顏色的深淺，代表當前層占母層的比例多寡。
+        </p>
+        <p>上方的下列式選單也可直接選擇欲查詢之州／國家，旭日圖會呈現相對應的內容。</p>
+        <p>當滑鼠移動至區塊上（Hover），會呈現該區塊之總移民人口，以及其佔母層的比例數字。</p>
       </div>
     </div>
   </div>
-  <!-- <div class="container-fluid">
-    <div class="row">
-      <div class="col-lg-4" id="map-column" style="width: 37.5%">
-        <div id="map-europe" style="height: 500px; width: 500px;"></div>
-      </div>
-      <div class="col-lg-1" style="width: 12.5%">
-        <div class="wrapper" style="margin: 0 auto; width: 800px; position: absolute;">
-          <div style="float: left;"><canvas id="my-canvas" width="30" height="200"></canvas></div>
-          <div id="mapLegend-text">
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-1">
-      </div> -->
-  <div class="col-lg-5" id="sunburst-column">
-    <p style="text-align: center; position: relative; left: -28.75px;">The distribution of immigrants per country in
-      2021<br></p>
-  </div>
-  <div class="intro">
-    <h1>Introduction</h1>
-    <p>At the left is a sunburst which in the middle shows the whole of World.</p>
-    <p>The first layer (all the children of World) contains all the continents that are colored on the map. These are
-      color coded to the percentage of immigrants that they took up in comparison to the rest of World.</p>
-    <p>The second layer tells the user about the nature of the immigrants per country. These cells are color coded to
-      the percentage of that country. </p>
-    <p>This information, together which theabsoluteamount of immigrants is displayed per country with a tooltip, while
-      hovering over it with the mouse.</p>
-    <p>At the top left is a dropdown menu, which will let the user select a country, on which is than zoomed in at
-      the sunburst.</p>
-  </div>
-  <!-- </div>
-  </div> -->
-  <!-- <script src="../JavaScript/mapLegend.js"></script>
-  <script src="../JavaScript/map.js"></script> -->
   <script src="sunburst.js"></script>
-  <!-- <script src="../JavaScript/barchart.js"></script> -->
-  <!-- <div class="container">
-    <div class="row top-buffer">
-      <div class="col-lg-4"></div>
-      <div class="col-lg-4">
-        <div class="container-fluid">
-          <form>
-            <label class="radio-inline">
-              <input type="radio" checked="" name="optradio" id="sorting-radio1" value="1">
-              <label class="radio-text">Alphabetical Order</label>
-              </input>
-            </label>
-            <label class="radio-inline">
-              <input type="radio" name="optradio" id="sorting-radio2" value="2">
-              <label class="radio-text">Reversed Numerical Order</label>
-              </input>
-            </label>
-          </form>
-        </div>
-      </div>
-      <div class="col-lg-4"></div>
-    </div>
-  </div> -->
 </body>
 
 </html>
