@@ -186,8 +186,8 @@
         <div class="card-body">
             <p class="card-text">
                 <b>● 操作說明 ●</b><br>
-                下方的時間軸可以使用滑鼠拖拉，在1990至2020年間的資料切換。Play鈕可以用動畫的方式顯示1990至2020年的變化。
-                <br>Clean按鈕可以清空地圖。按鈕則可以自行選取不同年代做疊圖比較。長條圖會依照使用者顯示不同資料。點擊橘點可以顯示該國的移民輸出國。
+                時間軸slider可以使用滑鼠拖拉，在1990至2020年間的資料切換。Play鈕可以用動畫的方式顯示1990至2020年的變化。
+                <br>Clean按鈕可以清空地圖。長條圖會依照使用者顯示不同資料。點擊橘點可以顯示該國的移民輸出國。
                 <br><br>
                 <b>● 圖片說明 ●</b><br>
                 呈現各國之間的移民路徑，線條粗細代表移民人數多寡。若線條為紅色，代表該移民路徑女性多於男性；藍色則代表該移民路徑男性多於女性。<br>黃點代表移民輸出國，橘點代表該年前五名移民輸出國，箭頭為移民方向，黑點代表輸入國。國家顏色深淺代表該國GDP高低。
@@ -1836,59 +1836,121 @@ q.await(ondraw);
 
 function ondraw(error,dataGeo,data){
 //legend
-var valuesToShow = [10]
+var valuesToShow = [2,4,6,8,10]
+var xCircle = 100
+var xLabel = 250
+var yCircle = 470
 svg
 	.selectAll("legend")
 	.data(valuesToShow)
 	.enter()
 	.append("circle")
 	.attr("class","legends")
-	.attr("cx", 100 )
-	.attr("cy", 450 )
+	.attr("cx", xCircle )
+	.attr("cy", function(d){ return yCircle-d;} )
 	.attr("r", function(d){ return d;})
-	.style("fill", "#FF8000")
-	.attr("stroke", "none");
+	// .style("fill", "#FF8000")
+	.style("fill", function(d){ 
+		if (d==2){
+			return "#FF8000";
+		}
+		else{
+			return "none";
+		}
+	})
+	.attr("stroke", "black");
 svg
 	.selectAll("legend")
 	.data(valuesToShow)
 	.enter()
 	.append("circle")
 	.attr("class","legends")
-	.attr("cx", 150 )
-	.attr("cy", 450 )
+	.attr("cx", 50 )
+	.attr("cy", 460 )
 	.attr("r", function(d){ return d;})
 	.style("fill", "#FFD306")
 	.attr("stroke", "none");
+svg
+	.selectAll("legend")
+	.data(valuesToShow)
+	.enter()
+	.append("circle")
+	.attr("class","legends")
+	.attr("cx", 75 )
+	.attr("cy", 460 )
+	.attr("r", function(d){ return d;})
+	.style("fill", "#FF8000")
+	.attr("stroke", "none");
+
+
 svg.append("text")
 	.attr('x', 120)
 	.attr("y", 480)
-	.text("橘點:移出人數前五名 黃點:其他國家")
-	.attr("text-anchor", "middle")
+	.text("橘點:移出人數前五名 黃點:其他國家 黑點:移民移入國家 ")
+	.attr("text-anchor", "left")
 	.style("font", "10px times")
 svg.append("text")
 	.attr('x', 82)
 	.attr("y", 490)
-	.text("黑點:移民移入國家")
-	.attr("text-anchor", "middle")
+	.text("最小圈:50萬人 次小圈:100萬人 中間:200萬人 次大:400萬人 最大:800萬人")
+	.attr("text-anchor", "left")
 	.style("font", "10px times")
 svg
 	.append('rect')
-	.attr('x', 40)
-	.attr('y', 390)
-	.attr('height', 2)
+	.attr('x', 80)
+	.attr('y', 380)
+	.attr('height', 2.5)
 	.attr('width', 40)
 	.style("fill", "#2828FF")
 svg
 	.append('rect')
-	.attr('x', 40)
-	.attr('y', 380)
-	.attr('height', 2)
+	.attr('x', 80)
+	.attr('y', 370)
+	.attr('height', 2.5)
 	.attr('width', 40)
 	.style("fill", "#FF5151")
+
+svg
+	.append('rect')
+	.attr('x', 80)
+	.attr('y', 350)
+	.attr('height',12.5)
+	.attr('width', 40)
+	.style("fill", "#2828FF")
+
+svg
+	.append('rect')
+	.attr('x', 80)
+	.attr('y', 390)
+	.attr('height',1.25)
+	.attr('width', 40)
+	.style("fill", "#2828FF")
+
 svg.append("text")
 	.attr('x', 40)
-	.attr("y", 410)
-	.text("一百萬人移民 藍線:男多 紅線:女多")
+	.attr("y", 360)
+	.text("五百萬人")
+	.attr("text-anchor", "left")
+	.style("font", "10px times")
+
+svg.append("text")
+	.attr('x', 40)
+	.attr("y", 380)
+	.text("一百萬人")
+	.attr("text-anchor", "left")
+	.style("font", "10px times")
+
+svg.append("text")
+	.attr('x', 40)
+	.attr("y", 395)
+	.text("五十萬人")
+	.attr("text-anchor", "left")
+	.style("font", "10px times")
+
+svg.append("text")
+	.attr('x', 40)
+	.attr("y", 420)
+	.text("藍線:男多 紅線:女多")
 	.attr("text-anchor", "left")
 	.style("font", "10px times")
 
@@ -1904,6 +1966,9 @@ svg1.append("text")
 	.text("UK:英國 AE:阿聯 KZ:哈薩克 UZ:烏茲別克")
 	.attr("text-anchor", "left")
 	.style("font", "10px times")
+
+
+
 
 g1.append("g")
 	.selectAll("path")
@@ -2091,7 +2156,7 @@ else if (d.properties.name=="Afghanistan"&& $('.year-label').text()==1990){
 	show_top5(308,312);
 	update(Afghanistan1990);
 }
-else if (d.properties.name=="India"&& $('.year-label').text()==1990){
+else if (d.pr10operties.name=="India"&& $('.year-label').text()==1990){
 	show_top5(312,322);
 	update(India1990);
 }
