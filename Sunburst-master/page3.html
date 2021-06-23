@@ -31,11 +31,319 @@
       </ul>
     </div>
   </nav>
-     <div height="20%" style="font-size:0.5px" padding="0px" >
-      圖名:World Immigrants flow map <br>圖例說明:透過點擊世界地圖上的國家區域，來觀看從此國家流出到其他國家的流向，底下是10個流出數量最多國家的Bar chart 簡要說明:移民圖表最好還是能夠繪製在世界地圖上面，但就會面臨資料量重疊的問題，原本打算實作OD data smoothing algorithm 但時間上有點困難，最後選擇改用 edge bundling在解決問題。至於實際資料的顯示可以透過Tooltip來表示，但太過繁瑣且依賴互動，所以改用multiview ，在底下加上數字最高10個國家bar chart.
+     <div height="20%" style="font-size:0.5px" padding="0px" line-height: 0px>
+      圖名:World Immigrants flow map <br>圖例&簡要說明:透過點擊世界地圖上的國家區域，來觀看從此國家流出到其他國家的流向，底下是10個流出數量最多國家的Bar chart。移民圖表最好還是能夠繪製在世界地圖上面，但就會面臨資料量重疊的問題，原本打算實作OD data smoothing algorithm 但時間上有點困難，最後選擇改用 edge bundling在解決問題。至於實際資料的顯示可以透過Tooltip來表示，但太過繁瑣且依賴互動，所以改用multiview ，在底下加上數字最高10個國家bar chart.
     </div>
     <div id="root"></div>
-    <script src="bundle.js"></script>
+    <script>
+      (function (React$1, ReactDOM, d3$1, topojson) {
+  'use strict';
+
+  var React$1__default = 'default' in React$1 ? React$1['default'] : React$1;
+  ReactDOM = ReactDOM && Object.prototype.hasOwnProperty.call(ReactDOM, 'default') ? ReactDOM['default'] : ReactDOM;
+
+  // Get the topojson from world-atlas and convert to geojson data for later to graph the World
+
+  const jsonUrl = 'https://unpkg.com/world-atlas@2.0.2/countries-50m.json';
+
+  const useData = () => {
+    const [data, setData] = React$1.useState(null);
+    //console.log(data);
+
+    React$1.useEffect(() => {
+      d3$1.json(jsonUrl).then(topology => {
+        const { countries } = topology.objects;
+        setData({
+          countries: topojson.feature(topology, countries),
+          interiors: topojson.mesh(topology, countries, (a, b) => a !== b)
+        });
+      });
+    }, []);
+
+    return data;
+  };
+
+  // Get the immidata from my Gist
+
+
+  const dataUrl ="https://gist.githubusercontent.com/serjunfan/3dddca9b501a61b1c8922bfcabb44a5e/raw/8e6f9369be2467fddc98efdf8b4db8978520a8e3/2020(Russia_ver3).csv";
+  const immiData1 = () => {
+    const [data, setData] = React$1.useState(null);
+    React$1.useEffect(() => {
+      d3$1.csv(dataUrl).then(setData);
+    },[]);
+
+    return data;
+  };
+
+  // Get the immidata from my Gist
+
+  const dataUrl$1 ="https://gist.githubusercontent.com/serjunfan/42a3c78447ee2d947681451105366e6a/raw/bb53c438beec9253d78985330bfedafa87386f13/coordinate.csv";
+  const coorData = () => {
+    const [data, setData] = React$1.useState(null);
+    React$1.useEffect(() => {
+      d3$1.csv(dataUrl$1).then(setData);
+    },[]);
+    
+    return data;
+  };
+
+  // Set up the coordinates for later to graph the Lines. Only 2020's data are set up 
+  const setuppoints = ( countrytable,immidata ) => {
+      const des = "Region, development group, country or area of destination";
+      const ori = "Region, development group, country or area of origin";
+      immidata.forEach( d => {
+      d[des] = d[des].trim().replace('*','');
+      d[ori] = d[ori].trim().replace('*','');
+      });
+      for( let i = 0 ; i < immidata.length ; i++){
+        if(countrytable.has(immidata[i][des]) 
+           && countrytable.has(immidata[i][ori]
+             )){
+          immidata[i]["coordinates"] = [countrytable.get(immidata[i][des]),countrytable.get(immidata[i][ori])];
+          immidata[i]["type"] = "LineString";
+        }
+        else {
+          immidata.splice(i,1);
+          i--;
+          }
+        }
+      for( let i = 0 ; i < immidata.length ; i++){
+        if(immidata[i]['2020'] == '..' ){
+          immidata.splice(i,1);
+          i--;
+        }
+      }
+    };
+
+  const setUpdata = (coordata ,immidata) => {
+  const countrytable = new Map();
+    coordata.forEach((d, i) => {
+      d['points'] = [+d.longitude, +d.latitude];
+    });
+    coordata.forEach((d, i) => {
+         if (d.name == 'United States')
+        countrytable.set(
+          'United States of America',
+          d.points
+        );
+       else countrytable.set(d.name, d.points);
+    });
+    setuppoints(countrytable, immidata);
+      immidata.forEach( d =>{
+      if(typeof(d['2020']) === "string")
+        d['2020'] = +( (d['2020']).replace(/\s/g, '')) ;
+    });
+  };
+
+  const projection = d3.geoNaturalEarth1();
+  const flowdata = (filterdata) => {
+    const nodes = {};
+    let results = [];
+    if( filterdata.length != 0 ){
+    filterdata.forEach( (d,i)=> {
+      nodes[`${i}`] = {x:projection(d.coordinates[0])[0] ,y:projection(d.coordinates[0])[1]} ;
+    });
+      nodes[`${Object.keys(nodes).length}`] = {x:projection(filterdata[0].coordinates[1])[0],
+                             y:projection(filterdata[0].coordinates[1])[1]};
+      
+      const edges = filterdata.map( (d,i) => {
+       let obj = {};
+       obj['source'] = `${Object.keys(nodes).length-1}`;
+       obj['target'] = `${i}`;
+       return obj;
+     });
+
+    const fbundling = d3.ForceEdgeBundling()   
+          .nodes(nodes)
+          .edges(edges);
+    
+     results = fbundling();
+     
+    }
+      return results;
+    };
+
+  const AxisBottom = ({ xScale, innerHeight,  tickOffset = 3 }) =>
+    xScale.domain().map(tickValue => (
+      React.createElement( 'g', {
+        className: "tick", key: tickValue, transform: `translate(${xScale(tickValue)+30},0)` },
+        React.createElement( 'text', { style: { textAnchor: 'middle' }, stroke: 'black', dy: ".71em", y: innerHeight + tickOffset },
+          tickValue ==='United States of America' ? 'USA' 
+          : tickValue === 'United Kingdom' ? 'UK' : tickValue
+        )
+      )
+    ));
+
+  const AxisLeft = ({ yScale, innerWidth, 
+        tickFormat,tickOffset = 3,ticknum =4 }) =>
+    yScale.ticks(ticknum).map(tickValue => (
+      React.createElement( 'g', { className: "tickLeft", transform: `translate(0,${yScale(tickValue)})` },
+        React.createElement( 'line', { x2: innerWidth }),
+        React.createElement( 'text', {
+          key: tickValue, style: { textAnchor: 'end' }, x: -tickOffset, dy: ".32em", stroke: "black" },
+          tickFormat(tickValue)
+        )
+      )
+    ));
+
+  const Marks = ({
+    top10data,
+    xScale,
+    yScale,
+    xValue,
+    yValue,
+    tooltipFormat,
+    barHeight
+  }) =>
+    top10data.map(d => (
+      React.createElement( 'rect', {
+        className: "mark", x: xScale(xValue(d)), y: yScale(yValue(d)), width: xScale.bandwidth(), height: barHeight - yScale(yValue(d)) },
+      React.createElement( 'title', null, tooltipFormat(yValue(d)) )
+      )
+    ));
+
+  const width = 960;
+  const height = 500;
+  const heightforbar = 100;
+  const barsize = 0.2;
+  const margin = { top:0 ,right:30 ,bottom:25,left:90 };
+
+
+  const Bar = ( {filterdata} ) => {
+    const yValue = d => d["2020"];
+    const xValue = d => d["Region, development group, country or area of destination"];
+    const top10data = filterdata
+      .sort((a,b) =>  d3.descending(yValue(a),yValue(b) ))
+      .slice(0,10);
+    const max = d3.max(top10data, d => d["2020"] );
+    const barHeight = heightforbar - margin.top - margin.bottom;
+    const innerWidth = width - margin.left - margin.right;
+
+
+    const xScale = d3$1.scaleBand()
+      .domain(top10data.map(xValue))
+      .range([0, innerWidth])
+      .paddingInner(0.15);
+
+    const yScale = d3.scaleSqrt()
+      .domain([0, d3.max(top10data, yValue )])
+      .range([barHeight, 0]);
+
+    return (
+      React$1__default.createElement( 'g', { transform: `translate(${margin.left},${height - height * barsize})` },
+         React$1__default.createElement( AxisBottom, {
+            xScale: xScale, innerHeight: barHeight, tickOffset: 8 }),
+        React$1__default.createElement( AxisLeft, { yScale: yScale, innerWidth: innerWidth, tickFormat: d3.format("~s"), tickOffset: 5, ticknum: 4 }),
+        React$1__default.createElement( Marks, {
+          top10data: top10data, xScale: xScale, yScale: yScale, xValue: xValue, yValue: yValue, tooltipFormat: d => d, barHeight: barHeight })
+      )
+    );
+  };
+
+  // Graph the World map and the line based on immigrants
+  const projection$1 = d3$1.geoNaturalEarth1();
+  const path = d3$1.geoPath(projection$1);
+  const graticule = d3$1.geoGraticule();
+    
+  const d3line = d3.line()
+        .x(function(d){ return d.x; })
+        .y(function(d){ return d.y; })
+        .curve(d3.curveLinear);
+
+  const Marks$1 = ({graphdata,coordata,immidata}) => {
+    const [selected, setSelected] = React$1.useState('Brazil');
+    const handleClick = (e) => {
+      if (selected == e.currentTarget.getAttribute('title')) {
+        setSelected(null);
+      } else {
+        setSelected(e.currentTarget.getAttribute('title'));
+      }
+    };
+
+    setUpdata(coordata, immidata);
+    
+    let filterdata = []; 
+    
+    if( selected !== null){ 
+     filterdata = immidata.filter(
+      (d) =>
+        d[
+          'Region, development group, country or area of origin'
+        ] == selected
+    );
+    }
+    else
+      filterdata = immidata;
+
+    const results = React$1.useMemo( () => flowdata(filterdata) ); 
+    return (
+      React$1__default.createElement( 'g', { className: "marks" },
+        graphdata.countries.features.map((feature) => (
+          React$1__default.createElement( 'g', null,
+          React$1__default.createElement( 'path', {
+            className: "country", d: path(feature), cursor: 'pointer', title: feature.properties.name, onClick: (e) => handleClick(e), fill: selected == feature.properties.name
+                ? 'red'
+                : '#e9f3e5' }),
+          React$1__default.createElement( 'title', null, feature.properties.name )
+          ) 
+        )),
+        React$1__default.createElement( 'path', {
+          className: "interiors", d: path(graphdata.interiors) }),
+        results.map( d => (
+          React$1__default.createElement( 'path', { className: "flows", d: d3line(d), stroke: '#006000', fill: 'none', 'stroke-width': 1, 'stroke-opacity': 0.15 }) ) 
+                    ),
+        filterdata.map ( d => 
+          (
+            //stroke: '#36dad2'
+            React$1__default.createElement( 'circle', {
+              r: 2, cx: projection$1(d.coordinates[0])[0], cy: projection$1(d.coordinates[0])[1], onClick: (e) => handleClick(e), cursor: 'pointer', fill: '#fbf419', stroke: '#252525' }) 
+       ) ),
+        React$1__default.createElement( Bar, { filterdata: filterdata })
+      )
+    );
+  };
+
+  //Main function. Actually a React H
+
+  const width$1 = 960;
+  const height$1 = 500;
+
+  const App = () => {
+    const svgRef = React$1.useRef();
+    const gRef = React$1.useRef();
+    React$1.useEffect( () => {
+      const svg = d3.select(svgRef.current);
+      const g = d3.select(gRef.current);
+      const zoomFunc = d3.zoom().scaleExtent([0.8,5])
+      .translateExtent([[0,0],[width$1,height$1]])
+      .on("zoom", () =>{
+        g.attr('transform',d3.event.transform);
+        console.log("zoomed");
+        });
+      zoomFunc(svg);
+    } );
+    const graphdata = useData();
+    const coordata = coorData();
+    const immidata = immiData1();
+    if (!graphdata || !immidata || !coordata) {
+      return React$1__default.createElement( 'pre', null, "Loading..." );
+    }
+    return (
+      React$1__default.createElement( 'svg', { width: width$1, height: height$1, ref: svgRef, fill: "current", stroke: "current" },
+        React$1__default.createElement( 'g', { ref: gRef },
+           React$1__default.createElement( 'rect', { fill: "#3b5bb5", width: width$1, height: height$1 }),
+            React$1__default.createElement( Marks$1, { graphdata: graphdata, immidata: immidata, coordata: coordata })
+        )
+      )
+    );
+  };
+  const rootElement = document.getElementById('root');
+  ReactDOM.render(React$1__default.createElement( App, null ), rootElement);
+
+}(React, ReactDOM, d3, topojson));
+
+    </script>
 
   </body>
 </html>
